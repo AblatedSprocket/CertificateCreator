@@ -8,44 +8,41 @@ package certificatecreator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import static javafx.scene.paint.Color.rgb;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -55,50 +52,38 @@ import javafx.stage.Stage;
  * @author Andy
  */
 public class CertificateCreator extends Application {
+    String selectedStudent;
     @Override
-    
-    public void start(Stage primaryStage) throws FileNotFoundException, IOException {
-        Properties defaultProps = new Properties();
+    public void start(Stage primaryStage) {
+        //get current date
+        String date = getDate();
+        //get user directory and config file directory
         String userPath = System.getProperty("user.dir");
         String configPath = userPath + File.separator + "config.txt";
+        //Perform initial check for student list
         String stdntLstPath = getStudentList(configPath);
         StringProperty stdntLstTxt = new SimpleStringProperty();
-        List<String> studentList = new ArrayList<String>();
+        BooleanProperty hasDir = new SimpleBooleanProperty(false);
+        List<String> studentList = new ArrayList<>();
         if (stdntLstPath.isEmpty()) {
             stdntLstTxt.set("No student list has been selected");
         }
         else {
+            hasDir.set(true);
             stdntLstTxt.set("Selected Student List:\n" + stdntLstPath);
             extractStudentList(studentList, stdntLstPath);
         }
         Label stdntLbl = new Label("Student Name:");
         TextField stdntFld = new TextField();
-        Text dirStsTxt = new Text();
-        ObservableList boxList = FXCollections.observableList(studentList);
-        ListView<String> stdntListView = createListView(boxList);
-        FilteredList<String> filteredItems = new FilteredList<String>(boxList, p -> true);
-        stdntFld.textProperty().addListener((obs, oldVal, newVal) -> {
-            final String selected = stdntListView.getSelectionModel().getSelectedItem();
-            Platform.runLater(() -> {
-                if (selected == null || !selected.equals(stdntFld.getText())) {
-                    filteredItems.setPredicate(boxListItem -> {
-                        if(boxListItem.toUpperCase().startsWith(newVal.toUpperCase())) {
-                            System.out.println("Filtering based on " + newVal);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    });
-                }
-            });
-        });
-        stdntListView.setItems(filteredItems);
-        dirStsTxt.textProperty().bind(stdntLstTxt);
+        Text statusText = createStatusText(stdntLstTxt);
+        ListView visibleStudentList = createVisibleStudentList(studentList,
+                stdntFld);
+        
         Button setDirBtn = createDirectoryButton(stdntLstTxt, configPath,
                 primaryStage);
         
-        Scene scene = new Scene(createLayout(stdntLbl, stdntFld, stdntListView, setDirBtn,
-                dirStsTxt), 500, 500);
+        Scene scene = new Scene(createLayout(stdntLbl, stdntFld,
+                visibleStudentList, setDirBtn, statusText));
         scene.getStylesheets().add(CertificateCreator.class.getResource(
                 "Main.css").toExternalForm());
         primaryStage.setTitle("Certificate Writer");
@@ -107,11 +92,48 @@ public class CertificateCreator extends Application {
         primaryStage.show();
         
     }
-    private ListView<String> createListView(ObservableList<String> boxList) {
-        ListView<String> stdntListView = new ListView<String>();
-        stdntListView.setEditable(false);
-        return stdntListView;
+    private String getDate() {
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
+        Calendar cal = Calendar.getInstance();
+        String date = dateFormat.format(cal.getTime());
+        return date;
     }
+    private ListView createVisibleStudentList(List<String> studentList, TextField stdntFld) {
+        ObservableList boxList = FXCollections.observableList(studentList);
+        ListView<String> visibleStudentList = new ListView<>();
+        visibleStudentList.setEditable(false);
+        FilteredList<String> filteredItems = new FilteredList<>(boxList, p -> true);
+        stdntFld.textProperty().addListener((obs, oldVal, newVal) -> {
+            final String selected = visibleStudentList.getSelectionModel().getSelectedItem();
+            Platform.runLater(() -> {
+                if (selected == null || !selected.equals(stdntFld.getText())) {
+                    filteredItems.setPredicate(boxListItem -> {
+                        if(boxListItem.toUpperCase().startsWith(newVal.toUpperCase())) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
+        visibleStudentList.setItems(filteredItems);
+        visibleStudentList.setOnMouseClicked(new EventHandler<MouseEvent>(){
+            @Override
+            public void handle(MouseEvent event) {
+                selectedStudent = visibleStudentList.getSelectionModel().getSelectedItem();
+            }
+        });
+        return visibleStudentList;
+        
+    }
+    private Text createStatusText(StringProperty stdntLstTxt) {
+        Text statusText = new Text();
+        statusText.textProperty().bind(stdntLstTxt);
+        //statusText.setFill(rgb(0, 0, 255));
+        return statusText;
+    }
+    
     /*private int findIndex(String arg, String[] list) {
         boolean comp = true;
         int listInd = 0;
@@ -151,8 +173,6 @@ public class CertificateCreator extends Application {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
         }
-        System.out.println("Student list is now:\n");
-        System.out.println(studentList);
     }
     private String getStudentList(String filPath) {
         Path filePath = Paths.get(filPath);
@@ -166,15 +186,16 @@ public class CertificateCreator extends Application {
         }
         return stdntLstPath;
     }
+    
     private GridPane createLayout(Label stdntLbl, TextField stdntFld, ListView<String> stdntListView, 
-            Button setDirBtn, Text dirStsTxt) {
+            Button setDirBtn, Text statusTxt) {
         GridPane layout = new GridPane();
         layout.setAlignment(Pos.CENTER);
         layout.add(stdntLbl, 1, 1);
         layout.add(stdntFld, 2, 1);
         layout.add(stdntListView, 3, 1);
         layout.add(setDirBtn, 2, 2);
-        layout.add(dirStsTxt, 2, 3);
+        layout.add(statusTxt, 2, 3);
         return layout;
     }
     
@@ -182,11 +203,8 @@ public class CertificateCreator extends Application {
         launch(args);
     }
     private void createConfig(String filPath, String text) {
-        try {
-            File file = new File(filPath);
-            FileOutputStream os = new FileOutputStream(file);
-            OutputStreamWriter osw = new OutputStreamWriter(os);
-            Writer w = new BufferedWriter(osw);
+        try (Writer w = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(new File(filPath))))){
             w.write(text);
             w.close();
             } catch (IOException io) {
@@ -211,7 +229,7 @@ public class CertificateCreator extends Application {
         
         return dirBtn;
     }
-    /* Program functionality
+    /*// Program functionality
     public HSSFSheet getSheet(String fid) {
         try {
             POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(fid));
