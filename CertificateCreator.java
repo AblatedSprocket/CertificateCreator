@@ -20,22 +20,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -50,29 +56,49 @@ import javafx.stage.Stage;
  */
 public class CertificateCreator extends Application {
     @Override
+    
     public void start(Stage primaryStage) throws FileNotFoundException, IOException {
         Properties defaultProps = new Properties();
         String userPath = System.getProperty("user.dir");
         String configPath = userPath + File.separator + "config.txt";
         String stdntLstPath = getStudentList(configPath);
         StringProperty stdntLstTxt = new SimpleStringProperty();
+        List<String> studentList = new ArrayList<String>();
         if (stdntLstPath.isEmpty()) {
             stdntLstTxt.set("No student list has been selected");
         }
         else {
             stdntLstTxt.set("Selected Student List:\n" + stdntLstPath);
-            ArrayList<String[]> studentList = new ArrayList<String[]>();
             extractStudentList(studentList, stdntLstPath);
         }
-        Label stdntLbl = new Label("Student:");
+        Label stdntLbl = new Label("Student Name:");
         TextField stdntFld = new TextField();
         Text dirStsTxt = new Text();
+        ObservableList boxList = FXCollections.observableList(studentList);
+        ListView<String> stdntListView = createListView(boxList);
+        FilteredList<String> filteredItems = new FilteredList<String>(boxList, p -> true);
+        stdntFld.textProperty().addListener((obs, oldVal, newVal) -> {
+            final String selected = stdntListView.getSelectionModel().getSelectedItem();
+            Platform.runLater(() -> {
+                if (selected == null || !selected.equals(stdntFld.getText())) {
+                    filteredItems.setPredicate(boxListItem -> {
+                        if(boxListItem.toUpperCase().startsWith(newVal.toUpperCase())) {
+                            System.out.println("Filtering based on " + newVal);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
+        stdntListView.setItems(filteredItems);
         dirStsTxt.textProperty().bind(stdntLstTxt);
         Button setDirBtn = createDirectoryButton(stdntLstTxt, configPath,
                 primaryStage);
         
-        Scene scene = new Scene(createLayout(stdntLbl, stdntFld, setDirBtn,
-                dirStsTxt));
+        Scene scene = new Scene(createLayout(stdntLbl, stdntFld, stdntListView, setDirBtn,
+                dirStsTxt), 500, 500);
         scene.getStylesheets().add(CertificateCreator.class.getResource(
                 "Main.css").toExternalForm());
         primaryStage.setTitle("Certificate Writer");
@@ -81,21 +107,34 @@ public class CertificateCreator extends Application {
         primaryStage.show();
         
     }
-    private void extractStudentList(ArrayList<String[]> studentList,
+    private ListView<String> createListView(ObservableList<String> boxList) {
+        ListView<String> stdntListView = new ListView<String>();
+        stdntListView.setEditable(false);
+        return stdntListView;
+    }
+    /*private int findIndex(String arg, String[] list) {
+        boolean comp = true;
+        int listInd = 0;
+        while(comp) {
+            if (list[listInd] == arg){
+                comp = false;
+            }
+            listInd++;
+        }
+        return listInd;
+    }*/
+    private void extractStudentList(List<String> studentList,
             String stdntLstPath) {
-        ArrayList<String[]> rawStudentList = new ArrayList<String[]>();
+        
         String str;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stdntLstPath));
             String header = reader.readLine();
             while (reader.readLine() == "");
-            
             String[] colNames = reader.readLine().split(" ");
-            System.out.println("Column names:");
             int firstNameInd = 0;
             int lastNameInd = 0;
             for(int i = 0; i < colNames.length; i++) {
-                System.out.println(colNames[i]);
                 if (colNames[i].matches("First_Name")){
                     firstNameInd = i;
                 }
@@ -103,28 +142,17 @@ public class CertificateCreator extends Application {
                     lastNameInd = i;
                 }
             }
-            
-            System.out.println("First name index is:" + firstNameInd +
-                    "\nLast name index is:" + lastNameInd);
+            int lines = 0;
             while ((str = reader.readLine()) != null) {
                 String[] array = str.split(" ");
-                
-                System.out.println("Str is now:\n" + str);
-                System.out.println("Array is now:\n" + array);
-                rawStudentList.add(array);
+                studentList.add(array[firstNameInd]+ " " + array[lastNameInd]);
             }
-            while ((str = reader.readLine()) != null) {
-                String[] array = str.split(" ");
-                
-                System.out.println("Str is now:\n" + str);
-                System.out.println("Array is now:\n" + array);
-                rawStudentList.add(array);
-            }
-            System.out.println("Raw student list:\n" + rawStudentList);
         } catch(IOException io) {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
         }
+        System.out.println("Student list is now:\n");
+        System.out.println(studentList);
     }
     private String getStudentList(String filPath) {
         Path filePath = Paths.get(filPath);
@@ -138,12 +166,13 @@ public class CertificateCreator extends Application {
         }
         return stdntLstPath;
     }
-    private GridPane createLayout(Label stdntLbl, TextField stdntFld, 
+    private GridPane createLayout(Label stdntLbl, TextField stdntFld, ListView<String> stdntListView, 
             Button setDirBtn, Text dirStsTxt) {
         GridPane layout = new GridPane();
         layout.setAlignment(Pos.CENTER);
         layout.add(stdntLbl, 1, 1);
         layout.add(stdntFld, 2, 1);
+        layout.add(stdntListView, 3, 1);
         layout.add(setDirBtn, 2, 2);
         layout.add(dirStsTxt, 2, 3);
         return layout;
