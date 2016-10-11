@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="CertificateCreator.jnlp">
+  <information>
+    <title>CertificateCreator</title>
+    <vendor>Andy</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="lib\CertificateCreator-Preloader.jar" size="3163" download="progress" />
+    <jar href="CertificateCreator.jar" size="8564" download="eager" />
+    <jar href="lib\poi-3.15.jar" size="2579580" download="eager" />
+    <jar href="lib\poi-ooxml-3.15.jar" size="1338241" download="eager" />
+    <jar href="lib\poi-ooxml-schemas-3.15.jar" size="5859007" download="eager" />
+    <jar href="lib\xmlbeans-2.6.0.jar" size="2730866" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="CertificateCreator" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="certificatecreator.CertificateCreator"  name="CertificateCreator"  preloader-class="certificatecreator.preloader.CertificateCreator_Preloader"/>
+  <update check="always"/>
+</jnlp>
