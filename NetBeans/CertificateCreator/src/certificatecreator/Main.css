@@ -6,16 +6,23 @@
     Author     : Andy
  */
  .text-field {
-     -fx-max-width: 200px;
+     -fx-pref-width: 200px;
      -fx-vgap: 15px;
  }
  .list-view {
      -fx-pref-width: 200px;
+     -fx-pref-height: 350px;
      -fx-hgap: 5px;
      -fx-vgap: 5px;
  }
- #studentInfo {
+ #studentInfoDiv2 {
      -fx-spacing: 15px;
+ }
+ #studentInfoDiv3 {
+     -fx-spacing: 30px;
+ }
+ #studentInfoDiv4 {
+     -fx-spacing: 90px;
  }
  #statusText {
      -fx-pref-width: 200px;
@@ -23,4 +30,7 @@
  #layout {
      -fx-spacing: 15px;
      -fx-padding: 10px;
+ }
+ .label {
+     -fx-max-width: 200px;
  }
