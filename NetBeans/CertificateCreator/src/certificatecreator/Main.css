@@ -17,6 +17,9 @@
  #studentInfo {
      -fx-spacing: 15px;
  }
+ #userInput {
+     -fx-spacing: 90px;
+ }
  #statusText {
      -fx-pref-width: 200px;
  }
