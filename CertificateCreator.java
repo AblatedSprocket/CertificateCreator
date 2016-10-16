@@ -23,9 +23,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,9 +34,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
@@ -51,14 +51,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import static javafx.scene.control.OverrunStyle.LEADING_ELLIPSIS;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.ScrollPane;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import static javafx.scene.paint.Color.rgb;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
+import static javafx.scene.paint.Color.rgb;
 import static javafx.scene.paint.Color.rgb;
 //import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 /**
@@ -115,23 +115,18 @@ public class CertificateCreator extends Application {
         TextField stdntFld = new TextField();
         ListView visibleStudentList = createVisibleStudentList(studentList,
                 stdntFld, properties);
-        Button setDirBtn = createDirectoryButton(configPath, properties,
+        Button setDirBtn = createDirectoryButton(properties, primaryStage);
+        Button setTempBtn = createChooseTemplateButton(properties, templateTxt,
                 primaryStage);
-        Button setTempBtn = createChooseTemplateButton(properties, primaryStage);
         Scene scene = new Scene(createLayout(stdntLbl, stdntFld,
-                visibleStudentList, setDirBtn, listStatusText, setTempBtn, tempStatusText, primaryStage));
+                visibleStudentList, setDirBtn, listStatusText, setTempBtn,
+                tempStatusText, primaryStage));
         scene.getStylesheets().add(CertificateCreator.class.getResource(
                 "Main.css").toExternalForm());
         primaryStage.setTitle("Certificate Writer");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-    
-    
-    private Label createReadMeLabel() {
-        Label readMe = new Label("README");
-        return readMe;
     }
     
     
@@ -179,7 +174,35 @@ public class CertificateCreator extends Application {
                 String extension = tempPath.substring(
                         tempPath.lastIndexOf(".") + 1, tempPath.length());
                 if ("docx".equals(extension)) {
-                    createStudentCertificate(tempPath);
+                    Alert createCertificateAlert = new Alert(
+                            AlertType.CONFIRMATION, "Create student certificate for "
+                                    + selectedStudent + "?");
+                    createCertificateAlert.showAndWait().ifPresent(response -> {
+                        if (response == ButtonType.OK) {
+                            Path path = Paths.get(userPath + File.separator +
+                                    selectedStudent + " Certificate.docx");
+                            if (Files.exists(path)) {
+                                Alert overwriteExistingAlert = new Alert (
+                                        AlertType.WARNING, selectedStudent
+                                                + " Certificate.docx exists. Overwrite?");
+                                overwriteExistingAlert.showAndWait().ifPresent(
+                                        confirmOverwrite -> {
+                                    if (confirmOverwrite == ButtonType.OK) {
+                                        try{
+                                            Files.deleteIfExists(path);
+                                            createStudentCertificate(tempPath);
+                                        } catch(IOException io) {
+                                            System.err.println("Could not "
+                                                    + "delete existing certificate. New certificate was not generated. " + io);
+                                        }
+                                    }
+                                });
+                            } else {
+                                createStudentCertificate(tempPath);
+                            }
+                            
+                        }
+                    });
                 } else {
                     
                 }
@@ -264,23 +287,6 @@ public class CertificateCreator extends Application {
     }
     
     
-    private String getStudentList(String filPath) {
-        Path filePath = Paths.get(filPath);
-        String stdntLstPath = "";
-        try{
-            List<String> filPathLines = Files.readAllLines(filePath);
-            if(filPathLines.isEmpty()) {   
-            } else {
-                stdntLstPath = filPathLines.get(0);
-            }
-            
-        } catch (IOException io) {
-            createConfig(filPath, "");
-        }
-        return stdntLstPath;
-    }
-    
-    
     private VBox createLayout(Label stdntLbl, TextField stdntFld,
             ListView<String> stdntListView, Button setDirBtn,
             Label listStatusText, Button setTempBtn, Label tempStatusText, Stage primaryStage) {
@@ -294,6 +300,7 @@ public class CertificateCreator extends Application {
         directoryInfo.getChildren().add(listStatusText);
         listStatusText.setTextOverrun(LEADING_ELLIPSIS);
         VBox templateInfo = new VBox();
+        templateInfo.setId("studentInfo");
         templateInfo.getChildren().add(setTempBtn);
         templateInfo.getChildren().add(tempStatusText);
         tempStatusText.setTextOverrun(LEADING_ELLIPSIS);
@@ -301,29 +308,44 @@ public class CertificateCreator extends Application {
         userInput.setId("userInput");
         userInput.getChildren().add(directoryInfo);
         userInput.getChildren().add(templateInfo);
+        VBox studentList = new VBox();
+        Label studentListLbl = new Label("Student List:");
+        studentList.getChildren().add(studentListLbl);
+        studentList.getChildren().add(stdntListView);
         HBox content = new HBox();
         content.setId("layout");
         content.getChildren().add(userInput);
-        content.getChildren().add(stdntListView);
+        content.getChildren().add(studentList);
         VBox layout = new VBox();
         MenuBar menuBar = new MenuBar();
         Menu menuFile = new Menu("File");
-        MenuItem readMe = new MenuItem("Readme");
-        readMe.setOnAction(new EventHandler<ActionEvent>() {
+        MenuItem readMeMenu = new MenuItem("ReadMe");
+        readMeMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                final Stage dialog = new Stage();
-                dialog.initModality(Modality.APPLICATION_MODAL);
-                dialog.initOwner(primaryStage);
-                dialog.setTitle("Readme");
+                final Stage readMeStage = new Stage();
+                readMeStage.initModality(Modality.APPLICATION_MODAL);
+                readMeStage.initOwner(primaryStage);
+                readMeStage.setTitle("ReadMe");
                 VBox dialogVbox = new VBox(20);
-                dialogVbox.getChildren().add(new Text("This is a Dialog"));
-                Scene dialogScene = new Scene(dialogVbox, 300, 200);
-                dialog.setScene(dialogScene);
-                dialog.show();
+                BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("readme.txt")));
+                StringBuilder readMeLines = new StringBuilder();
+                try {
+                    getText(readMeLines, br);
+                } catch (IOException io) {
+                    System.err.println("Could not read readme file: " + io);
+                }
+                Text readMeContent = new Text(readMeLines.toString());
+                readMeContent.setWrappingWidth(400);
+                ScrollPane readMePane = new ScrollPane();
+                readMePane.setContent(readMeContent);
+                dialogVbox.getChildren().add(readMePane);
+                Scene dialogScene = new Scene(dialogVbox, 420, 420);
+                readMeStage.setScene(dialogScene);
+                readMeStage.show();
             }
-         });
-        menuFile.getItems().add(readMe);
+        });
+        menuFile.getItems().add(readMeMenu);
         menuBar.getMenus().add(menuFile);
             layout.getChildren().add(menuBar);
             layout.getChildren().add(content);
@@ -332,20 +354,21 @@ public class CertificateCreator extends Application {
     }
     
     
-    private void createConfig(String filPath, String text) {
-        try {
-            try (Writer w = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(new File(filPath))))) {
-                w.write(text);
-            }
-            } catch (IOException io) {
-                    System.err.println("Could not write to config file: " + io);
-            }
+    private void getText(StringBuilder readMeLines, BufferedReader br) throws IOException {
+        int i = 0;
+        String line = "";
+        
+        while (line != null) {
+            readMeLines.append(line).append("\n");
+            line = br.readLine();
+        }
     }
     
     
-    private Button createDirectoryButton(String filPath, Properties properties, Stage primaryStage) {
+    private Button createDirectoryButton(Properties properties, Stage primaryStage) {
         FileChooser chooseList = new FileChooser();
+        File path = new File(resourcePath);
+        chooseList.setInitialDirectory(path);
         chooseList.setTitle("Select Student File");
         Button dirBtn = new Button("Set Student List");
         dirBtn.setId("dirBtn");
@@ -372,6 +395,8 @@ public class CertificateCreator extends Application {
     
     private Button createChooseTemplateButton(Properties properties, StringProperty templateTxt, Stage primaryStage) {
         FileChooser chooseTemplate = new FileChooser();
+        File path = new File(resourcePath);
+        chooseTemplate.setInitialDirectory(path);
         chooseTemplate.setTitle("Select Certificate Template");
         Button chooseTemplateBtn = new Button("Set Certificate Template");
         chooseTemplateBtn.setId("chooseTemplateBtn");
