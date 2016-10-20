@@ -23,7 +23,7 @@
  #statusText {
      -fx-pref-width: 200px;
  }
- #layout {
+ #content {
      -fx-spacing: 15px;
      -fx-padding: 10px;
  }
