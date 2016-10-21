@@ -82,7 +82,7 @@ public class CertificateCreator extends Application {
         Scene scene = new Scene(createLayout(studentList, properties, primaryStage));
         scene.getStylesheets().add(CertificateCreator.class.getResource(
                 "Main.css").toExternalForm());
-        primaryStage.setTitle("Certificate Writer");
+        primaryStage.setTitle("Certificate Creator");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -223,7 +223,7 @@ public class CertificateCreator extends Application {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
             Alert studentListNotFound = new Alert(AlertType.WARNING,
-                    "Specified student list was not found. Please choosea different list.");
+                    "Specified student list was not found. Please choose a different list.");
             studentListNotFound.showAndWait();
         } catch (NullPointerException npe) {
             System.err.println("Method copy failed:" + npe);
@@ -476,8 +476,8 @@ public class CertificateCreator extends Application {
                 }else {
                     Alert badTypeAlert = new Alert (
                         AlertType.WARNING, "Selected certificate file is not "
-                            + " of proper format. Please choose another file "
-                            + " or consult ReadMe for more information.");
+                            + "of proper format. Please choose another file "
+                            + "or consult ReadMe for more information.");
                     badTypeAlert.showAndWait();
                 }
             } 

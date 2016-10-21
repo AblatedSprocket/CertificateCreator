@@ -3,7 +3,7 @@ Ant-Version: Apache Ant 1.9.4
 Created-By: 1.8.0_101-b13 (Oracle Corporation)
 Bundle-Name: My Library
 Bundle-Version: 1.0
-Bundle-Date: 2016-10-19 17:13:45 PDT
+Bundle-Date: 2016-10-21 06:22:08 PDT
 Codebase: 127.0.0.1
 Implementation-Title: My Library
 Implementation-Version: 1.0
