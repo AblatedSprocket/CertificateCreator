@@ -7,33 +7,35 @@ NOTICE: Certificate Creator will generate certificates in the directory it is in
 
 
 General:
-Certificate Creator generates student certificates automatically using a user-specified stuent list and .docx template. All program functionality is detailed in order of chronological steps that should be taken for proper setup of Certificate Creator on first use.
+Certificate Creator generates student certificates automatically using a user-specified student list and .docx template. All program functionality is detailed in order of chronological steps that should be taken for proper setup of Certificate Creator on first use.
 
-On first use, Certificate Creater generates a resources folder in the directory it is executed from. While not required, it is recommended that any and all student lists and certificate templates be stored in this folder. The "data.properties" file should be ignored. Any user-made changes to this file may corrupt Certificate Creator. Should this occur, deleting the "data.properties" file should resolve any issues.
+On first use, Certificate Creator generates a "Resources" folder in the directory it is executed from. While not required, it is recommended that any and all student lists and certificate templates be stored in this folder. Unused or outdated lists and templates can be deleted for organization but this is not necessary. The "data.properties" file should be ignored. Any user-made changes to this file may corrupt Certificate Creator. Should this occur, deleting the "data.properties" file should resolve any issues. A new student list and template will need to be designated.
 
 
 
 Set Student List:
-The set student list button opens a windows explorer window which is used to choose the desired student list. Opening a file from this explorer window will restart Certificate Creator and populate the list on the right side of Certificate Creator's home window. If the student list is moved or deleted, a notification will appear upon startup of Certificate Creator announcing that the selected student list no longer exists.
+The set student list button opens a Windows Explorer window which is used to choose the desired student list. Opening a file from this window will restart Certificate Creator and populate the list on the right side of Certificate Creator's home window. If the student list is moved or deleted, a notification will appear upon startup of Certificate Creator announcing that the selected student list no longer exists.
 
-Certificate Creator is designed to take exported text (.txt) files from PowerSchool as student lists. Other files will work provided that the first line is a header and the list of students is divided into at least two columns with "First_Name" and "Last_Name" as the first rows in each column.
+Certificate Creator is designed to take exported text (.txt) files from PowerSchool as student lists. Other files will work provided that the first line is a header with some arbitrary text and the list of students is divided into at least two columns with "First_Name" and Last_Name" as the first rows in each column.
 
-Certificate Creator looks for "First_Name" and "Last_Name" explicitly, so when a list is exported from PowerSchools, as many columns in any order can be included in the file used by Certificate Creator.
+Certificate Creator looks for "First_Name" and "Last_Name" explicitly, so when a list is exported from PowerSchools, as many columns as desired can be included in any order within the file used by Certificate Creator.
 
 
 
 Set Certificate Template:
-The "Set Certificate Template" button opens a windows explorer window which is used to choose the desired certificate template. Only word documents written using xml (.docx) will function as templates. If the wrong file type is selected, a notification will appear requesting that another file be selected. If the certificate template is moved or deleted, a notification will appear announcing that the template no longer exists once a student name is clicked. If you are modifying or creating your own template, please adhere to guidelines (see Modifying/Creating Template).
+The "Set Certificate Template" button opens a Windows Explorer window which is used to choose the desired certificate template. Only word documents written using xml (.docx) will function as templates. If the wrong file type is selected, a notification will appear requesting that another file be selected. If the certificate template is moved or deleted, a notification will appear announcing that the template no longer exists. If you are modifying or creating your own template, please adhere to guidelines (see Modifying/Creating Template).
 
 
 
 Specify Student:
-After the student list and certificate template are set and the student list is properly populated, you can either scroll through the list to find the desired student or begin typing the desired name into the "Student Name" field. As you type, the list will filter names that match the letters typed.
+After the student list and certificate template are set and the student list is properly populated, you can either scroll through the list to find the desired student or begin typing the desired name into the "Student Name" field. As you type, the list will filter out names that do not match the letters typed.
 
 
 
 Generate Certificate:
-Once the desired student is located in the list, clicking the name once will prompt for certificate generation confirmation. If the file already exists, the user will be prompted to overwrite it. Once written, certificate can be found in the same folder as Certificate Creator.
+Once the desired student is located in the list, clicking the name once will prompt for certificate generation confirmation. If the file already exists, the user will be prompted to overwrite it. Once written, certificates can be found in the same folder as Certificate Creator.
+
+Tip: If printing multiple certificates, highlight all certificates that need printing (by using Ctrl + click on each file or clicking the first file, holding shift and clicking the last file) right click on one certificate, and select print to print all certificates at once. Be aware that this uses default settings (color/grayscale, resolution, etc.) which may need changing for proper printing.
 
 
 

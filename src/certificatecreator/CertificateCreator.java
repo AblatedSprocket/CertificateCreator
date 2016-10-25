@@ -360,7 +360,7 @@ public class CertificateCreator extends Application {
         //Make readme window open when menu item is clicked.
         readMeMenu.setOnAction((ActionEvent event) -> {
             final Stage readMeStage = new Stage();
-            readMeStage.initModality(Modality.APPLICATION_MODAL);
+            readMeStage.initModality(Modality.NONE);
             readMeStage.initOwner(primaryStage);
             readMeStage.setTitle("ReadMe");
             VBox dialogVbox = new VBox(20);
