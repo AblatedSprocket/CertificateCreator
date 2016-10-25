@@ -55,7 +55,6 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import static javafx.scene.paint.Color.rgb;
-//import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 
 public class CertificateCreator extends Application {
     
@@ -79,7 +78,8 @@ public class CertificateCreator extends Application {
         
         List<String> studentList = new ArrayList<>();
         //Create GUI.
-        Scene scene = new Scene(createLayout(studentList, properties, primaryStage));
+        Scene scene = new Scene(createLayout(studentList, properties,
+                primaryStage));
         scene.getStylesheets().add(CertificateCreator.class.getResource(
                 "Main.css").toExternalForm());
         primaryStage.setTitle("Certificate Creator");
@@ -108,7 +108,8 @@ public class CertificateCreator extends Application {
         //Creates visible list for GUI
         
         //Create internal ObservableList based on studentList.
-        ObservableList<String> observableStudentList = FXCollections.observableList(studentList);
+        ObservableList<String> observableStudentList = 
+                FXCollections.observableList(studentList);
         //Initialize uneditable list visible in GUI.
         ListView<String> visibleStudentList = new ListView<>();
         visibleStudentList.setEditable(false);
@@ -223,7 +224,8 @@ public class CertificateCreator extends Application {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
             Alert studentListNotFound = new Alert(AlertType.WARNING,
-                    "Specified student list was not found. Please choose a different list.");
+                    "Specified student list was not found. "
+                    + "Please choose a different list.");
             studentListNotFound.showAndWait();
         } catch (NullPointerException npe) {
             System.err.println("Method copy failed:" + npe);

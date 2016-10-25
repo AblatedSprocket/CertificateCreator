@@ -1,11 +1,12 @@
 Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.9.4
-Created-By: 1.8.0_101-b13 (Oracle Corporation)
-Bundle-Name: My Library
+Created-By: 1.8.0_74-b02 (Oracle Corporation)
+Author: Andrew Burch
+Bundle-Name: Certificate Creator
 Bundle-Version: 1.0
-Bundle-Date: 2016-10-21 06:22:08 PDT
+Bundle-Date: 2016-10-25 13:15:48 PDT
 Codebase: 127.0.0.1
-Implementation-Title: My Library
+Implementation-Title: Certificate Creator
 Implementation-Version: 1.0
-Implementation-URL: http://www.example.com
+Sealed: true
 
