@@ -7,6 +7,7 @@ NOTICE: Certificate Creator will generate certificates in the directory it is in
 
 
 General:
+
 Certificate Creator generates student certificates automatically using a user-specified student list and .docx template. All program functionality is detailed in order of chronological steps that should be taken for proper setup of Certificate Creator on first use.
 
 On first use, Certificate Creator generates a "Resources" folder in the directory it is executed from. While not required, it is recommended that any and all student lists and certificate templates be stored in this folder. Unused or outdated lists and templates can be deleted for organization but this is not necessary. The "data.properties" file should be ignored. Any user-made changes to this file may corrupt Certificate Creator. Should this occur, deleting the "data.properties" file should resolve any issues. A new student list and template will need to be designated.
@@ -14,25 +15,29 @@ On first use, Certificate Creator generates a "Resources" folder in the director
 
 
 Set Student List:
-The set student list button opens a Windows Explorer window which is used to choose the desired student list. Opening a file from this window will restart Certificate Creator and populate the list on the right side of Certificate Creator's home window. If the student list is moved or deleted, a notification will appear upon startup of Certificate Creator announcing that the selected student list no longer exists.
 
-Certificate Creator is designed to take exported text (.txt) files from PowerSchool as student lists. Other files will work provided that the first line is a header with some arbitrary text and the list of students is divided into at least two columns with "First_Name" and Last_Name" as the first rows in each column.
+The set student list button opens a window which is used to choose the desired student list. Opening a file from this window will restart Certificate Creator and populate the list on the right side of Certificate Creator's home window. If the student list is moved or deleted, a notification will appear upon startup of Certificate Creator announcing that the selected student list no longer exists.
 
-Certificate Creator looks for "First_Name" and "Last_Name" explicitly, so when a list is exported from PowerSchools, as many columns as desired can be included in any order within the file used by Certificate Creator.
+Certificate Creator is designed to take formatted text (.txt) files as lists. The list should be at least two columns with "First Name" and Last Name" as the headers for the rows Certificate Creator will use. Additionally, each column should be separated by a tab.
+
+Certificate Creator looks for "First Name" and "Last Name" column headers explicitly, so as many columns as desired can be included in any order within the list file used by certificate Creator.
 
 
 
 Set Certificate Template:
-The "Set Certificate Template" button opens a Windows Explorer window which is used to choose the desired certificate template. Only word documents written using xml (.docx) will function as templates. If the wrong file type is selected, a notification will appear requesting that another file be selected. If the certificate template is moved or deleted, a notification will appear announcing that the template no longer exists. If you are modifying or creating your own template, please adhere to guidelines (see Modifying/Creating Template).
+
+The "Set Certificate Template" button opens a window which is used to choose the desired certificate template. Only word documents written using xml (.docx) will function as templates. If the wrong file type is selected, a notification will appear requesting that another file be selected. If the certificate template is moved or deleted, a notification will appear announcing that the template no longer exists. If you are modifying or creating your own template, please adhere to guidelines (see Modifying/Creating Template).
 
 
 
 Specify Student:
+
 After the student list and certificate template are set and the student list is properly populated, you can either scroll through the list to find the desired student or begin typing the desired name into the "Student Name" field. As you type, the list will filter out names that do not match the letters typed.
 
 
 
 Generate Certificate:
+
 Once the desired student is located in the list, clicking the name once will prompt for certificate generation confirmation. If the file already exists, the user will be prompted to overwrite it. Once written, certificates can be found in the same folder as Certificate Creator.
 
 Tip: If printing multiple certificates, highlight all certificates that need printing (by using Ctrl + click on each file or clicking the first file, holding shift and clicking the last file) right click on one certificate, and select print to print all certificates at once. Be aware that this uses default settings (color/grayscale, resolution, etc.) which may need changing for proper printing.
@@ -40,6 +45,7 @@ Tip: If printing multiple certificates, highlight all certificates that need pri
 
 
 Modifying/Creating Template:
+
 When creating a template, ensure margins are set to 0.25" on all sides and the page orientation is set to landscape. Additionally, all text should be removed from the template. Font, font size, indentation, and text content are generated by CertificateCreator and cannot be changed by the user at this point. Any images added to the template (border, seals, electronic signatures, etc.) should be set independently of text. In Microsoft Word 2010 this can be done as follows:
 
 1. Right click the image
@@ -47,3 +53,5 @@ When creating a template, ensure margins are set to 0.25" on all sides and the p
 3. Navigate to the "Position" tab on the top left of the Layout Options window
 4. Under "Horizontal" and "Vertical" click the bubbles for "Absolute Position"
 5. In the dropdown menus following "to the right of" and "below" select the "Page" option
+
+Following these steps should format the images such that they do not interfere with Certificate Creator's generated text.

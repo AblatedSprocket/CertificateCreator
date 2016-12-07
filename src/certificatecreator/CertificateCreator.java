@@ -54,15 +54,12 @@ import static javafx.scene.paint.Color.rgb;
 public class CertificateCreator extends Application {
     
     String selectedStudent;
-    String date;
     String userPath;
     String resourcePath;
     @Override
     
     public void start(Stage primaryStage) {
         //Set class variables excluding selectedStudent.
-        
-        getDate();
         userPath = System.getProperty("user.dir");
         resourcePath = userPath + File.separator + "Resources";
         //Create resources folder if it does not exist.
@@ -89,12 +86,13 @@ public class CertificateCreator extends Application {
     }
     
     
-    private void getDate() {
+    private String getDate() {
         //Obtains current date and formats it.
         
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
         Calendar cal = Calendar.getInstance();
-        date = dateFormat.format(cal.getTime());
+        String date = dateFormat.format(cal.getTime());
+        return date;
     }
     
     
@@ -193,28 +191,24 @@ public class CertificateCreator extends Application {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     new FileInputStream(stdntLstPath)));
-            String header = reader.readLine();
-            if (header != null) {
-                while (reader.readLine() == "");
-                String[] colNames = reader.readLine().split(" ");
+                String[] colNames = reader.readLine().split("\\t");
                 int firstNameInd = 0;
                 int lastNameInd = 0;
                 for(int i = 0; i < colNames.length; i++) {
-                    if (colNames[i].matches("First_Name")){
+                    if (colNames[i].matches("First Name")) {
                         firstNameInd = i;
                     }
-                    else if (colNames[i].matches("Last_Name")) {
+                    else if (colNames[i].matches("Last Name")) {
                         lastNameInd = i;
                     }
                 }
                 String str;
                 int lines = 0;
                 while ((str = reader.readLine()) != null) {
-                    String[] array = str.split(" ");
+                    String[] array = str.split("\\t");
                     studentList.add(array[firstNameInd]+ " "
                             + array[lastNameInd]);
                 }
-            }
         } catch(IOException io) {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
@@ -485,11 +479,10 @@ public class CertificateCreator extends Application {
     
     private void createStudentCertificate(String tempPath) {
         //Creates student certificate.
-        
         //Read in template file and define output file.
         File inFile = new File(tempPath);
         File outFile = new File(userPath + File.separator + selectedStudent + 
-                " Certificate.docx");
+                "Certificate.docx");
         //Create output file. Throw alert if tempPath references nonexisting file.
         try {
             copy(inFile, outFile);
@@ -518,6 +511,7 @@ public class CertificateCreator extends Application {
                 r3.setFontSize(26);
                 r3.setText("For being a Lawton CARES winner on");
                 r3.addBreak();
+                String date = getDate();
                 r3.setText(date);
                 r3.addBreak();
                 r3.addBreak();
