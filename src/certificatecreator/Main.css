@@ -6,7 +6,7 @@
     Author     : Andy
  */
  .text-field {
-     -fx-max-width: 200px;
+     -fx-max-width: 500px;
      -fx-vgap: 15px;
  }
  .list-view {

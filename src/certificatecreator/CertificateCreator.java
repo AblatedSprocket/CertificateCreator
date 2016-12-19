@@ -1,3 +1,8 @@
+/* 
+ * Copyright 2016 Andrew Burch.
+ *
+ * This software is not available for distribution under any license.
+ */
 package certificatecreator;
 
 import java.io.BufferedReader;
@@ -209,6 +214,7 @@ public class CertificateCreator extends Application {
                     studentList.add(array[firstNameInd]+ " "
                             + array[lastNameInd]);
                 }
+                reader.close();
         } catch(IOException io) {
             System.err.println("I/O Exception in method extractStudentList: "
                     + io);
